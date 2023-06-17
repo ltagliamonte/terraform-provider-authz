@@ -6,10 +6,16 @@ package authz
 import (
 	"context"
 
-	authz "github.com/eko/authz/sdk"
+	authz "github.com/eko/authz/backend/pkg/authz"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"google.golang.org/grpc"
 )
+
+type AuthzClient struct {
+	client authz.ApiClient
+	token  string
+}
 
 // Provider -
 func Provider() *schema.Provider {
@@ -35,9 +41,6 @@ func Provider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"authz_policy": resourcePolicy(),
 		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"authz_policy": dataSourcePolicy(),
-		},
 		ConfigureContextFunc: providerConfigure,
 	}
 }
@@ -58,20 +61,32 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	var diags diag.Diagnostics
 
 	if (username != "") && (password != "") {
-		c, err := authz.NewClient(&authz.Config{
-			GrpcAddr:     *host,
-			ClientID:     username,
+		conn, err := grpc.Dial(*host, grpc.WithInsecure())
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Failed to connect: %v",
+			})
+			return nil, diags
+		}
+
+		c := authz.NewApiClient(conn)
+		resp, err := c.Authenticate(context.Background(), &authz.AuthenticateRequest{
+			ClientId:     username,
 			ClientSecret: password,
 		})
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Unable to create Authz client",
+				Summary:  "Unable to authenticate with Authz server",
 			})
 
 			return nil, diags
 		}
-		return c, diags
+		return AuthzClient{
+			client: c,
+			token:  resp.Token,
+		}, diags
 	}
 
 	diags = append(diags, diag.Diagnostic{
