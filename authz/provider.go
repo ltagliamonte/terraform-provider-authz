@@ -1,12 +1,12 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package hashicups
+package authz
 
 import (
 	"context"
 
-	"github.com/hashicorp-demoapp/hashicups-client-go"
+	authz "github.com/eko/authz/sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -15,30 +15,28 @@ import (
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"host": &schema.Schema{
+			"host": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("HASHICUPS_HOST", nil),
+				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_HOST", nil),
 			},
-			"username": &schema.Schema{
+			"username": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("HASHICUPS_USERNAME", nil),
+				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_USERNAME", nil),
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("HASHICUPS_PASSWORD", nil),
+				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_PASSWORD", nil),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"hashicups_order": resourceOrder(),
+			"authz_policy": resourcePolicy(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"hashicups_coffees":     dataSourceCoffees(),
-			"hashicups_order":       dataSourceOrder(),
-			"hashicups_ingredients": dataSourceIngredients(),
+			"authz_policy": dataSourcePolicy(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -60,29 +58,27 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	var diags diag.Diagnostics
 
 	if (username != "") && (password != "") {
-		c, err := hashicups.NewClient(host, &username, &password)
+		c, err := authz.NewClient(&authz.Config{
+			GrpcAddr:     *host,
+			ClientID:     username,
+			ClientSecret: password,
+		})
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Unable to create HashiCups client",
-				Detail:   "Unable to authenticate user for authenticated HashiCups client",
+				Summary:  "Unable to create Authz client",
 			})
 
 			return nil, diags
 		}
-
 		return c, diags
 	}
 
-	c, err := hashicups.NewClient(host, nil, nil)
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Unable to create HashiCups client",
-			Detail:   "Unable to create anonymous HashiCups client",
-		})
-		return nil, diags
-	}
+	diags = append(diags, diag.Diagnostic{
+		Severity: diag.Error,
+		Summary:  "Unable to create HashiCups client",
+		Detail:   "Empty username and/or password",
+	})
 
-	return c, diags
+	return nil, diags
 }

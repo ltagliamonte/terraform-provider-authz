@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package hashicups
+package authz
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func dataSourceOrder() *schema.Resource {
+func dataSourcePolicy() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceOrderRead,
 		Schema: map[string]*schema.Schema{
