@@ -15,55 +15,55 @@ import (
 
 func resourcePolicy() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceOrderCreate,
-		ReadContext:   resourceOrderRead,
-		UpdateContext: resourceOrderUpdate,
-		DeleteContext: resourceOrderDelete,
+		CreateContext: resourcePolicyCreate,
+		ReadContext:   resourcePolicyRead,
+		UpdateContext: resourcePolicyUpdate,
+		DeleteContext: resourcePolicyDelete,
 		Schema: map[string]*schema.Schema{
-			"last_updated": &schema.Schema{
+			"last_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"items": &schema.Schema{
+			"items": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"coffee": &schema.Schema{
+						"coffee": {
 							Type:     schema.TypeList,
 							MaxItems: 1,
 							Required: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"id": &schema.Schema{
+									"id": {
 										Type:     schema.TypeInt,
 										Required: true,
 									},
-									"name": &schema.Schema{
+									"name": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
-									"teaser": &schema.Schema{
+									"teaser": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
-									"description": &schema.Schema{
+									"description": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
-									"price": &schema.Schema{
+									"price": {
 										Type:     schema.TypeInt,
 										Computed: true,
 									},
-									"image": &schema.Schema{
+									"image": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
 								},
 							},
 						},
-						"quantity": &schema.Schema{
+						"quantity": {
 							Type:     schema.TypeInt,
 							Required: true,
 						},
@@ -77,7 +77,7 @@ func resourcePolicy() *schema.Resource {
 	}
 }
 
-func resourceOrderCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourcePolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*hc.Client)
 
 	// Warning or errors can be collected in a slice type
@@ -109,12 +109,12 @@ func resourceOrderCreate(ctx context.Context, d *schema.ResourceData, m interfac
 
 	d.SetId(strconv.Itoa(o.ID))
 
-	resourceOrderRead(ctx, d, m)
+	resourcePolicyRead(ctx, d, m)
 
 	return diags
 }
 
-func resourceOrderRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourcePolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*hc.Client)
 
 	// Warning or errors can be collected in a slice type
@@ -135,7 +135,7 @@ func resourceOrderRead(ctx context.Context, d *schema.ResourceData, m interface{
 	return diags
 }
 
-func resourceOrderUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourcePolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*hc.Client)
 
 	orderID := d.Id()
@@ -167,10 +167,10 @@ func resourceOrderUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		d.Set("last_updated", time.Now().Format(time.RFC850))
 	}
 
-	return resourceOrderRead(ctx, d, m)
+	return resourcePolicyRead(ctx, d, m)
 }
 
-func resourceOrderDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourcePolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*hc.Client)
 
 	// Warning or errors can be collected in a slice type
