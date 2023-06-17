@@ -1,4 +1,4 @@
-module terraform-provider-hashicups
+module terraform-provider-authz
 
 go 1.18
 
