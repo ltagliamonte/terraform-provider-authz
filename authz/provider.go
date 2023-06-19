@@ -80,7 +80,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  fmt.Sprintf("%s", err.Error()),
+				Summary:  err.Error(),
 			})
 
 			return nil, diags
@@ -95,7 +95,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	diags = append(diags, diag.Diagnostic{
 		Severity: diag.Error,
-		Summary:  "Unable to create HashiCups client",
+		Summary:  "Unable to create Authz client",
 		Detail:   "Empty username and/or password",
 	})
 
