@@ -5,16 +5,19 @@ package authz
 
 import (
 	"context"
+	"fmt"
 
 	authz "github.com/eko/authz/backend/pkg/authz"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 type AuthzClient struct {
 	client authz.ApiClient
-	token  string
+	md     metadata.MD
 }
 
 // Provider -
@@ -61,7 +64,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	var diags diag.Diagnostics
 
 	if (username != "") && (password != "") {
-		conn, err := grpc.Dial(*host, grpc.WithInsecure())
+		conn, err := grpc.Dial(*host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -69,23 +72,24 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 			})
 			return nil, diags
 		}
-
 		c := authz.NewApiClient(conn)
-		resp, err := c.Authenticate(context.Background(), &authz.AuthenticateRequest{
+		resp, err := c.Authenticate(ctx, &authz.AuthenticateRequest{
 			ClientId:     username,
 			ClientSecret: password,
 		})
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
-				Summary:  "Unable to authenticate with Authz server",
+				Summary:  fmt.Sprintf("%s", err.Error()),
 			})
 
 			return nil, diags
 		}
 		return AuthzClient{
 			client: c,
-			token:  resp.Token,
+			md: metadata.New(map[string]string{
+				"Authorization": fmt.Sprintf("Bearer %s", resp.Token),
+			}),
 		}, diags
 	}
 
