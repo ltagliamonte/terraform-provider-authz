@@ -1,7 +1,7 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
-HOSTNAME=hashicorp.com
+HOSTNAME=localhost
 NAMESPACE=edu
-NAME=hashicups
+NAME=authz
 BINARY=terraform-provider-${NAME}
 VERSION=0.3.1
 OS_ARCH=darwin_amd64
@@ -15,8 +15,7 @@ release:
 	goreleaser release --rm-dist --snapshot --skip-publish  --skip-sign
 
 install: build
-	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
-	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+	mv ${BINARY} ~/.terraform.d/plugins/
 
 test: 
 	go test -i $(TEST) || exit 1                                                   
