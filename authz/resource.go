@@ -104,18 +104,6 @@ func resourceRead(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	return diags
 }
 
-func flattenAttributesItems(attributes []*authz.Attribute) map[string]interface{} {
-	if attributes != nil {
-		res := make(map[string]interface{}, len(attributes))
-		for _, attribute := range attributes {
-			res[attribute.Key] = attribute.Value
-		}
-		return res
-	}
-
-	return make(map[string]interface{}, 0)
-}
-
 func resourceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	ac := m.(AuthzClient)
 

@@ -35,3 +35,14 @@ resource "authz_resource" "resource" {
     Environment = "test0"
   }
 }*/
+
+/*
+resource "authz_principal" "principal" {
+  name = "test-principal"
+  roles = ["authz-admin"]
+
+  attributes = {
+    Name        = "test"
+    Environment = "test0"
+  }
+}*/

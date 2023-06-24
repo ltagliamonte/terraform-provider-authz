@@ -47,16 +47,12 @@ func policyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	pActions := d.Get("actions").([]interface{})
 	pAttribute := d.Get("attribute_rules").([]interface{})
 
-	rList := getStrList(pResources)
-	aList := getStrList(pActions)
-	atList := getStrList(pAttribute)
-
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	resp, err := ac.client.PolicyCreate(outContext, &authz.PolicyCreateRequest{
 		Id:             pName,
-		Actions:        aList,
-		Resources:      rList,
-		AttributeRules: atList,
+		Actions:        getStrList(pActions),
+		Resources:      getStrList(pResources),
+		AttributeRules: getStrList(pAttribute),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -107,16 +103,12 @@ func policyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	pActions := d.Get("actions").([]interface{})
 	pAttribute := d.Get("attribute_rules").([]interface{})
 
-	rList := getStrList(pResources)
-	aList := getStrList(pActions)
-	atList := getStrList(pAttribute)
-
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	ac.client.PolicyUpdate(outContext, &authz.PolicyUpdateRequest{
 		Id:             pName,
-		Actions:        aList,
-		Resources:      rList,
-		AttributeRules: atList,
+		Actions:        getStrList(pActions),
+		Resources:      getStrList(pResources),
+		AttributeRules: getStrList(pAttribute),
 	})
 
 	return policyRead(ctx, d, m)

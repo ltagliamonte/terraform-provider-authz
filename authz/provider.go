@@ -42,8 +42,9 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"authz_policy":   policy(),
-			"authz_resource": resource(),
+			"authz_policy":    policy(),
+			"authz_resource":  resource(),
+			"authz_principal": principal(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

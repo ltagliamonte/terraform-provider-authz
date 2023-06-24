@@ -40,3 +40,15 @@ func getAttributesList(val map[string]interface{}) []*authz.Attribute {
 	}
 	return attributesList
 }
+
+func flattenAttributesItems(attributes []*authz.Attribute) map[string]interface{} {
+	if attributes != nil {
+		res := make(map[string]interface{}, len(attributes))
+		for _, attribute := range attributes {
+			res[attribute.Key] = attribute.Value
+		}
+		return res
+	}
+
+	return make(map[string]interface{}, 0)
+}
