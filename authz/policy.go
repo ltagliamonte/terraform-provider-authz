@@ -12,23 +12,12 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var (
-	listOfStrings = &schema.Schema{
-		Type:     schema.TypeList,
-		Computed: false,
-		Required: true,
-		Elem: &schema.Schema{
-			Type: schema.TypeString,
-		},
-	}
-)
-
-func resourcePolicy() *schema.Resource {
+func policy() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourcePolicyCreate,
-		ReadContext:   resourcePolicyRead,
-		UpdateContext: resourcePolicyUpdate,
-		DeleteContext: resourcePolicyDelete,
+		CreateContext: policyCreate,
+		ReadContext:   policyRead,
+		UpdateContext: policyUpdate,
+		DeleteContext: policyDelete,
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeString,
@@ -40,14 +29,14 @@ func resourcePolicy() *schema.Resource {
 				Required: true,
 				Computed: false,
 			},
-			"resources":       listOfStrings,
-			"actions":         listOfStrings,
-			"attribute_rules": listOfStrings,
+			"resources":       tfList,
+			"actions":         tfList,
+			"attribute_rules": tfList,
 		},
 	}
 }
 
-func resourcePolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func policyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	ac := m.(AuthzClient)
 
 	// Warning or errors can be collected in a slice type
@@ -58,9 +47,9 @@ func resourcePolicyCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	pActions := d.Get("actions").([]interface{})
 	pAttribute := d.Get("attribute_rules").([]interface{})
 
-	rList := getStringListFromInterface(pResources)
-	aList := getStringListFromInterface(pActions)
-	atList := getStringListFromInterface(pAttribute)
+	rList := getStrList(pResources)
+	aList := getStrList(pActions)
+	atList := getStrList(pAttribute)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	resp, err := ac.client.PolicyCreate(outContext, &authz.PolicyCreateRequest{
@@ -73,20 +62,12 @@ func resourcePolicyCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 	d.SetId(resp.Policy.Id)
-	resourcePolicyRead(ctx, d, m)
+	policyRead(ctx, d, m)
 
 	return diags
 }
 
-func getStringListFromInterface(list []interface{}) []string {
-	var strList []string
-	for _, k := range list {
-		strList = append(strList, k.(string))
-	}
-	return strList
-}
-
-func resourcePolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func policyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	ac := m.(AuthzClient)
 
 	// Warning or errors can be collected in a slice type
@@ -118,7 +99,7 @@ func resourcePolicyRead(ctx context.Context, d *schema.ResourceData, m interface
 	return diags
 }
 
-func resourcePolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func policyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	ac := m.(AuthzClient)
 
 	pName := d.Get("name").(string)
@@ -126,9 +107,9 @@ func resourcePolicyUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	pActions := d.Get("actions").([]interface{})
 	pAttribute := d.Get("attribute_rules").([]interface{})
 
-	rList := getStringListFromInterface(pResources)
-	aList := getStringListFromInterface(pActions)
-	atList := getStringListFromInterface(pAttribute)
+	rList := getStrList(pResources)
+	aList := getStrList(pActions)
+	atList := getStrList(pAttribute)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	ac.client.PolicyUpdate(outContext, &authz.PolicyUpdateRequest{
@@ -138,10 +119,10 @@ func resourcePolicyUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		AttributeRules: atList,
 	})
 
-	return resourcePolicyRead(ctx, d, m)
+	return policyRead(ctx, d, m)
 }
 
-func resourcePolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func policyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	ac := m.(AuthzClient)
 
 	// Warning or errors can be collected in a slice type

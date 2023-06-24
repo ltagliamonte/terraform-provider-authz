@@ -23,3 +23,15 @@ resource "authz_policy" "policy" {
   actions = ["delete", "edit"]
   attribute_rules = ["resource.owner_email == principal.email"]
 }*/
+
+/*
+resource "authz_resource" "resource" {
+  name = "aft.deploys.*"
+  kind = "aft.deploy"
+  value = "*"
+
+  attributes = {
+    Name        = "test"
+    Environment = "test0"
+  }
+}*/
