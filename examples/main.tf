@@ -46,3 +46,9 @@ resource "authz_principal" "principal" {
     Environment = "test0"
   }
 }*/
+
+/*
+resource "authz_role" "role" {
+  name = "test-role"
+  policies = ["authz-policies-admin","authz-audits-admin"]
+}*/
