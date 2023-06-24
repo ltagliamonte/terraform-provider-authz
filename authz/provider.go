@@ -1,6 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package authz
 
 import (
@@ -20,7 +17,6 @@ type AuthzClient struct {
 	md     metadata.MD
 }
 
-// Provider -
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
