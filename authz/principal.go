@@ -75,15 +75,13 @@ func principalRead(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	principal := resp.Principal
-	if err := d.Set("name", principal.Id); err != nil {
+	if err := d.Set("name", resp.Principal.Id); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("roles", principal.Roles); err != nil {
+	if err := d.Set("roles", resp.Principal.Roles); err != nil {
 		return diag.FromErr(err)
 	}
-	attributes := flattenAttributesItems(principal.Attributes)
+	attributes := flattenAttributesItems(resp.Principal.Attributes)
 	if err := d.Set("attributes", attributes); err != nil {
 		return diag.FromErr(err)
 	}

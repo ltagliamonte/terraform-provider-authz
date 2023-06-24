@@ -72,12 +72,10 @@ func roleRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.D
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	role := resp.Role
-	if err := d.Set("name", role.Id); err != nil {
+	if err := d.Set("name", resp.Role.Id); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("policies", role.Policies); err != nil {
+	if err := d.Set("policies", resp.Role.Policies); err != nil {
 		return diag.FromErr(err)
 	}
 	return diags

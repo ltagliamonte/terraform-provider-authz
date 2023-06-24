@@ -78,18 +78,16 @@ func policyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	policy := resp.Policy
-	if err := d.Set("name", policy.Id); err != nil {
+	if err := d.Set("name", resp.Policy.Id); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("resources", policy.Resources); err != nil {
+	if err := d.Set("resources", resp.Policy.Resources); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("actions", policy.Actions); err != nil {
+	if err := d.Set("actions", resp.Policy.Actions); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("attribute_rules", policy.AttributeRules); err != nil {
+	if err := d.Set("attribute_rules", resp.Policy.AttributeRules); err != nil {
 		return diag.FromErr(err)
 	}
 	return diags

@@ -86,18 +86,16 @@ func resourceRead(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	resource := resp.Resource
-	if err := d.Set("name", resource.Id); err != nil {
+	if err := d.Set("name", resp.Resource.Id); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("kind", resource.Kind); err != nil {
+	if err := d.Set("kind", resp.Resource.Kind); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("value", resource.Value); err != nil {
+	if err := d.Set("value", resp.Resource.Value); err != nil {
 		return diag.FromErr(err)
 	}
-	attributes := flattenAttributesItems(resource.Attributes)
+	attributes := flattenAttributesItems(resp.Resource.Attributes)
 	if err := d.Set("attributes", attributes); err != nil {
 		return diag.FromErr(err)
 	}

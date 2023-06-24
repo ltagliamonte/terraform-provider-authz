@@ -47,6 +47,12 @@ func Provider() *schema.Provider {
 			"authz_principal": principal(),
 			"authz_role":      role(),
 		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"authz_policy":    dsPolicy(),
+			"authz_principal": dsPrincipal(),
+			"authz_resource":  dsResource(),
+			"authz_role":      dsRole(),
+		},
 		ConfigureContextFunc: providerConfigure,
 	}
 }

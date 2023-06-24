@@ -14,10 +14,24 @@ var (
 			Type: schema.TypeString,
 		},
 	}
+	computedTfSet = &schema.Schema{
+		Type:     schema.TypeSet,
+		Computed: true,
+		Required: false,
+		Elem: &schema.Schema{
+			Type: schema.TypeString,
+		},
+	}
 	tfMap = &schema.Schema{
 		Type:     schema.TypeMap,
 		Computed: false,
 		Optional: true,
+		Elem:     &schema.Schema{Type: schema.TypeString},
+	}
+	computedTfMap = &schema.Schema{
+		Type:     schema.TypeMap,
+		Computed: true,
+		Required: false,
 		Elem:     &schema.Schema{Type: schema.TypeString},
 	}
 )
