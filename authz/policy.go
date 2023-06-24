@@ -29,9 +29,9 @@ func policy() *schema.Resource {
 				Required: true,
 				Computed: false,
 			},
-			"resources":       tfList,
-			"actions":         tfList,
-			"attribute_rules": tfList,
+			"resources":       tfSet,
+			"actions":         tfSet,
+			"attribute_rules": tfSet,
 		},
 	}
 }
@@ -43,16 +43,16 @@ func policyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	var diags diag.Diagnostics
 
 	pName := d.Get("name").(string)
-	pResources := d.Get("resources").([]interface{})
-	pActions := d.Get("actions").([]interface{})
-	pAttribute := d.Get("attribute_rules").([]interface{})
+	pResources := d.Get("resources").(*schema.Set)
+	pActions := d.Get("actions").(*schema.Set)
+	pAttribute := d.Get("attribute_rules").(*schema.Set)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	resp, err := ac.client.PolicyCreate(outContext, &authz.PolicyCreateRequest{
 		Id:             pName,
-		Actions:        getStrList(pActions),
-		Resources:      getStrList(pResources),
-		AttributeRules: getStrList(pAttribute),
+		Actions:        getSet(pActions),
+		Resources:      getSet(pResources),
+		AttributeRules: getSet(pAttribute),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -99,17 +99,20 @@ func policyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) di
 	ac := m.(AuthzClient)
 
 	pName := d.Get("name").(string)
-	pResources := d.Get("resources").([]interface{})
-	pActions := d.Get("actions").([]interface{})
-	pAttribute := d.Get("attribute_rules").([]interface{})
+	pResources := d.Get("resources").(*schema.Set)
+	pActions := d.Get("actions").(*schema.Set)
+	pAttribute := d.Get("attribute_rules").(*schema.Set)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
-	ac.client.PolicyUpdate(outContext, &authz.PolicyUpdateRequest{
+	_, err := ac.client.PolicyUpdate(outContext, &authz.PolicyUpdateRequest{
 		Id:             pName,
-		Actions:        getStrList(pActions),
-		Resources:      getStrList(pResources),
-		AttributeRules: getStrList(pAttribute),
+		Actions:        getSet(pActions),
+		Resources:      getSet(pResources),
+		AttributeRules: getSet(pAttribute),
 	})
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	return policyRead(ctx, d, m)
 }

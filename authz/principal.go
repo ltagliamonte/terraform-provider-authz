@@ -29,7 +29,7 @@ func principal() *schema.Resource {
 				Required: true,
 				Computed: false,
 			},
-			"roles":      tfList,
+			"roles":      tfSet,
 			"attributes": tfMap,
 		},
 	}
@@ -42,13 +42,13 @@ func principalCreate(ctx context.Context, d *schema.ResourceData, m interface{})
 	var diags diag.Diagnostics
 
 	pName := d.Get("name").(string)
-	pRoles := d.Get("roles").([]interface{})
+	pRoles := d.Get("roles").(*schema.Set)
 	pAttributes := d.Get("attributes").(map[string]interface{})
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	resp, err := ac.client.PrincipalCreate(outContext, &authz.PrincipalCreateRequest{
 		Id:         pName,
-		Roles:      getStrList(pRoles),
+		Roles:      getSet(pRoles),
 		Attributes: getAttributesList(pAttributes),
 	})
 	if err != nil {
@@ -94,15 +94,18 @@ func principalUpdate(ctx context.Context, d *schema.ResourceData, m interface{})
 	ac := m.(AuthzClient)
 
 	pName := d.Get("name").(string)
-	pRoles := d.Get("roles").([]interface{})
+	pRoles := d.Get("roles").(*schema.Set)
 	pAttributes := d.Get("attributes").(map[string]interface{})
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
-	ac.client.PrincipalUpdate(outContext, &authz.PrincipalUpdateRequest{
+	_, err := ac.client.PrincipalUpdate(outContext, &authz.PrincipalUpdateRequest{
 		Id:         pName,
-		Roles:      getStrList(pRoles),
+		Roles:      getSet(pRoles),
 		Attributes: getAttributesList(pAttributes),
 	})
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return principalRead(ctx, d, m)
 }
 

@@ -113,12 +113,15 @@ func resourceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) 
 	rAttributes := d.Get("attributes").(map[string]interface{})
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
-	ac.client.ResourceUpdate(outContext, &authz.ResourceUpdateRequest{
+	_, err := ac.client.ResourceUpdate(outContext, &authz.ResourceUpdateRequest{
 		Id:         rName,
 		Kind:       rKind,
 		Value:      rValue,
 		Attributes: getAttributesList(rAttributes),
 	})
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return resourceRead(ctx, d, m)
 }
 

@@ -29,7 +29,7 @@ func role() *schema.Resource {
 				Required: true,
 				Computed: false,
 			},
-			"policies": tfList,
+			"policies": tfSet,
 		},
 	}
 }
@@ -41,12 +41,12 @@ func roleCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	var diags diag.Diagnostics
 
 	rName := d.Get("name").(string)
-	rPolicies := d.Get("policies").([]interface{})
+	rPolicies := d.Get("policies").(*schema.Set)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
 	resp, err := ac.client.RoleCreate(outContext, &authz.RoleCreateRequest{
 		Id:       rName,
-		Policies: getStrList(rPolicies),
+		Policies: getSet(rPolicies),
 	})
 	if err != nil {
 		return diag.FromErr(err)
@@ -87,13 +87,16 @@ func roleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag
 	ac := m.(AuthzClient)
 
 	rName := d.Get("name").(string)
-	rPolicies := d.Get("policies").([]interface{})
+	rPolicies := d.Get("policies").(*schema.Set)
 
 	outContext := metadata.NewOutgoingContext(ctx, ac.md)
-	ac.client.RoleUpdate(outContext, &authz.RoleUpdateRequest{
+	_, err := ac.client.RoleUpdate(outContext, &authz.RoleUpdateRequest{
 		Id:       rName,
-		Policies: getStrList(rPolicies),
+		Policies: getSet(rPolicies),
 	})
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return roleRead(ctx, d, m)
 }
 

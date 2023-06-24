@@ -20,7 +20,7 @@ provider "authz" {
 resource "authz_policy" "policy" {
   name = "post-manage"
   resources = ["post.*"]
-  actions = ["delete", "edit"]
+  actions = ["edit","delete"]
   attribute_rules = ["resource.owner_email == principal.email"]
 }*/
 
@@ -50,5 +50,5 @@ resource "authz_principal" "principal" {
 /*
 resource "authz_role" "role" {
   name = "test-role"
-  policies = ["authz-policies-admin","authz-audits-admin"]
+  policies = ["authz-audits-admin","authz-policies-admin"]
 }*/

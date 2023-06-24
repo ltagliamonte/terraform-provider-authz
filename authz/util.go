@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	tfList = &schema.Schema{
-		Type:     schema.TypeList,
+	tfSet = &schema.Schema{
+		Type:     schema.TypeSet,
 		Computed: false,
 		Required: true,
 		Elem: &schema.Schema{
@@ -22,9 +22,9 @@ var (
 	}
 )
 
-func getStrList(list []interface{}) []string {
+func getSet(set *schema.Set) []string {
 	var strList []string
-	for _, k := range list {
+	for _, k := range set.List() {
 		strList = append(strList, k.(string))
 	}
 	return strList
