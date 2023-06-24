@@ -29,16 +29,16 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_HOST", nil),
 			},
-			"username": {
+			"client_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_USERNAME", nil),
+				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_CLIENT_ID", nil),
 			},
-			"password": {
+			"client_secret": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_PASSWORD", nil),
+				DefaultFunc: schema.EnvDefaultFunc("AUTHZ_CLIENT_SECRET", nil),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -58,8 +58,8 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	username := d.Get("username").(string)
-	password := d.Get("password").(string)
+	cID := d.Get("client_id").(string)
+	cSecret := d.Get("client_secret").(string)
 
 	var host *string
 
@@ -72,7 +72,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	if (username != "") && (password != "") {
+	if (cID != "") && (cSecret != "") {
 		conn, err := grpc.Dial(*host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
@@ -83,8 +83,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		}
 		c := authz.NewApiClient(conn)
 		resp, err := c.Authenticate(ctx, &authz.AuthenticateRequest{
-			ClientId:     username,
-			ClientSecret: password,
+			ClientId:     cID,
+			ClientSecret: cSecret,
 		})
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
@@ -105,7 +105,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	diags = append(diags, diag.Diagnostic{
 		Severity: diag.Error,
 		Summary:  "Unable to create Authz client",
-		Detail:   "Empty username and/or password",
+		Detail:   "Empty client_id and/or client_secret",
 	})
 
 	return nil, diags

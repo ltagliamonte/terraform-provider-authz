@@ -11,18 +11,18 @@ terraform {
 }
 
 provider "authz" {
-  username = "b870cb89-12c0-11ee-a138-0242ac160002"
-  password = "IfbMjHSs8rbm4aibqzaMARXM8lsJEZ370juvDdTz583x_OCX"
+  client_id = "dacc46e0-12d0-11ee-a138-0242ac160002"
+  client_secret = "6s89GprH2auEKoXzYWPlkYrvBjpGLcgCKjohWdOGi45891jl"
   host = "dns:///127.0.0.1:8081"
 }
 
-/*
+
 resource "authz_policy" "policy" {
   name = "post-manage"
   resources = ["post.*"]
   actions = ["edit","delete"]
   attribute_rules = ["resource.owner_email == principal.email"]
-}*/
+}
 
 /*
 resource "authz_resource" "resource" {

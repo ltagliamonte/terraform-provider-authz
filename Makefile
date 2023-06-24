@@ -27,5 +27,8 @@ start-authz:
 stop-authz:
 	docker-compose -f docker_compose/docker-compose.yml down
 
+create-authz-sa:
+	./create_authz_service_account.sh
+
 testacc: 
 	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m   

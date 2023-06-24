@@ -34,7 +34,7 @@ func testAccPreCheck(t *testing.T) {
 	if err := os.Getenv("AUTHZ_HOST"); err == "" {
 		t.Fatal("AUTHZ_HOST must be set for acceptance tests")
 	}
-	if err := os.Getenv("AUTHZ_PASSWORD"); err == "" {
-		t.Fatal("AUTHZ_PASSWORD must be set for acceptance tests")
+	if err := os.Getenv("AUTHZ_CLIENT_SECRET"); err == "" {
+		t.Fatal("AUTHZ_CLIENT_SECRET must be set for acceptance tests")
 	}
 }
