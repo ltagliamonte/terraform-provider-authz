@@ -61,7 +61,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	hVal, ok := d.GetOk("host")
 	if ok {
-		tempHost := hVal.(string)
+		tempHost := fmt.Sprintf("dns:///%s", hVal.(string))
 		host = &tempHost
 	}
 
