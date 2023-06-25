@@ -13,7 +13,7 @@ terraform {
 provider "authz" {
   client_id = "dacc46e0-12d0-11ee-a138-0242ac160002"
   client_secret = "6s89GprH2auEKoXzYWPlkYrvBjpGLcgCKjohWdOGi45891jl"
-  host = "dns:///127.0.0.1:8081"
+  host = "127.0.0.1:8081"
 }
 
 
@@ -26,8 +26,8 @@ resource "authz_policy" "policy" {
 
 /*
 resource "authz_resource" "resource" {
-  name = "aft.deploys.*"
-  kind = "aft.deploy"
+  name = "deploys.*"
+  kind = "deploy"
   value = "*"
 
   attributes = {
