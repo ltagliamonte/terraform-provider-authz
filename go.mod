@@ -1,6 +1,6 @@
 module terraform-provider-authz
 
-go 1.18
+go 1.17
 
 require (
 	github.com/eko/authz/backend v0.8.3
